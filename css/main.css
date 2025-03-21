@@ -49,17 +49,19 @@ input[type=checkbox]{
     word-break: break-all;
 }
 
-.card:hover {
-
-}
-
 .form-container {
     margin: 20px;
+    width: 30%;
 }
 
 .form-container form {
     display: flex;
     flex-direction: column;
+}
+
+.form-container form div {
+    display: flex;
+    justify-content: space-between;
 }
 
 .form-container form div {
@@ -72,6 +74,7 @@ input[type=checkbox]{
 
 .form-container form input {
     padding: 5px;
+    width: 80%;
 }
 
 .form-container form button {
@@ -80,8 +83,10 @@ input[type=checkbox]{
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .form-container form button:hover {
+    transition: 0.2s;
     background-color: #0056b3;
 }
