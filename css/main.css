@@ -56,19 +56,24 @@ input[type=checkbox]{
 .form-container {
     margin: 20px;
 }
+
 .form-container form {
     display: flex;
     flex-direction: column;
 }
+
 .form-container form div {
     margin-bottom: 10px;
 }
+
 .form-container form label {
     margin-right: 10px;
 }
+
 .form-container form input {
     padding: 5px;
 }
+
 .form-container form button {
     padding: 10px;
     background-color: #007bff;
@@ -76,6 +81,7 @@ input[type=checkbox]{
     border: none;
     cursor: pointer;
 }
+
 .form-container form button:hover {
     background-color: #0056b3;
 }

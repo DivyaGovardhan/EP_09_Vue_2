@@ -23,7 +23,7 @@ new Vue({
         checkCompletion(card) {
             const totalItems = card.items.length;
             const completedItems = card.items.filter(item => item.completed).length;
-            if (completedItems / totalItems > 0.5 && completedItems < totalItems) {
+            if (completedItems / totalItems >= 0.5 && completedItems < totalItems) {
                 this.moveCard(card, this.columns[0], this.columns[1]);
             } else if (completedItems === totalItems) {
                 card.completedAt = new Date().toLocaleString();
@@ -37,15 +37,16 @@ new Vue({
         },
 
         addCard() {
-            if (this.columns[0].cards.length < this.columns[0].maxCards) {
+            const itemCount = this.newCard.items.filter(item => item.trim() !== '').length;
+            if (itemCount >= 3 && itemCount <= 5 && this.columns[0].cards.length < this.columns[0].maxCards) {
                 const newCard = {
                     title: this.newCard.title,
-                    items: this.newCard.items.map(item => ({ text: item, completed: false }))
+                    items: this.newCard.items.filter(item => item.trim() !== '').map(item => ({ text: item, completed: false }))
                 };
                 this.columns[0].cards.push(newCard);
                 this.resetForm();
             } else {
-                alert('First column is full. Cannot add more cards.');
+                alert('Введите от 3 до 5 пунктов');
             }
         },
 
@@ -54,6 +55,29 @@ new Vue({
                 title: '',
                 items: ['', '', '']
             };
+        },
+
+        addItem() {
+            if (this.newCard.items.length < 5) {
+                this.newCard.items.push('');
+            }
+        }
+    },
+
+    watch: {
+        'newCard.items': {
+            handler(newItems) {
+                if (newItems.length < 5 && newItems[newItems.length - 1]) {
+                    this.addItem();
+                }
+            },
+            deep: true
+        }
+    },
+
+    computed: {
+        itemRequired() {
+            return this.newCard.items.map((item, index) => index < 3 || item.trim() !== '');
         }
     },
 
@@ -67,39 +91,24 @@ new Vue({
           </div>
           <div v-for="(item, index) in newCard.items" :key="index">
             <label :for="'item-' + index">Item {{ index + 1 }}:</label>
-            <input type="text" :id="'item-' + index" v-model="newCard.items[index]" required>
+            <input type="text" :id="'item-' + index" v-model="newCard.items[index]" :required="itemRequired[index]">
           </div>
           <button type="submit">Add Card</button>
         </form>
       </div>
-      
-      <div class="column-container">
-          <div v-for="(column, colIndex) in columns" :key="colIndex" class="column">
-            <h2>{{ column.name }}</h2>
-            <div v-for="(card, cardIndex) in column.cards" :key="cardIndex" class="card">
-              <h3>{{ card.title }}</h3>
-              <ul>
-                <li v-for="(item, itemIndex) in card.items" :key="itemIndex">
-                  <input type="checkbox" v-model="item.completed" @change="checkCompletion(card)" :disabled="isFirstColumnLocked() && colIndex === 0">
-                  {{ item.text }}
-                </li>
-              </ul>
-              <p v-if="card.completedAt">Completed at: {{ card.completedAt }}</p>
-            </div>
-          </div>
+      <div v-for="(column, colIndex) in columns" :key="colIndex" class="column">
+        <h2>{{ column.name }}</h2>
+        <div v-for="(card, cardIndex) in column.cards" :key="cardIndex" class="card">
+          <h3>{{ card.title }}</h3>
+          <ul>
+            <li v-for="(item, itemIndex) in card.items" :key="itemIndex">
+              <input type="checkbox" v-model="item.completed" @change="checkCompletion(card)" :disabled="isFirstColumnLocked() && colIndex === 0">
+              {{ item.text }}
+            </li>
+          </ul>
+          <p v-if="card.completedAt">Completed at: {{ card.completedAt }}</p>
+        </div>
       </div>
     </div>
   `,
-
-    mounted() {
-        // Пример данных для тестирования
-        this.columns[0].cards.push({
-            title: 'Card 1',
-            items: [
-                { text: 'Item 1', completed: false },
-                { text: 'Item 2', completed: false },
-                { text: 'Item 3', completed: false }
-            ]
-        });
-    }
 });
