@@ -75,6 +75,7 @@ input[type=checkbox]{
 .form-container form input {
     padding: 5px;
     width: 80%;
+    min-width: 200px;
 }
 
 .form-container form button {
@@ -84,6 +85,7 @@ input[type=checkbox]{
     border: none;
     cursor: pointer;
     border-radius: 5px;
+    min-width: 260px;
 }
 
 .form-container form button:hover {

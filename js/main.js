@@ -1,29 +1,28 @@
 new Vue({
     el: '#app',
 
-    data() {
-        return {
-            columns: [
-                { name: 'FirstColumn', cards: [], maxCards: 3 },
-                { name: 'SecondColumn', cards: [], maxCards: 5 },
-                { name: 'ThirdColumn', cards: [], maxCards: Infinity }
-            ],
-            newCard: {
-                title: '',
-                items: ['', '', '']
-            },
-            isLocked: false
-        };
+    data: {
+        columns: [
+            { name: 'FirstColumn', cards: [], maxCards: 3 },
+            { name: 'SecondColumn', cards: [], maxCards: 5 },
+            { name: 'ThirdColumn', cards: [], maxCards: null }
+        ],
+        newCard: {
+            title: '',
+            items: ['', '', '']
+        },
+        isLocked: false
     },
 
     methods: {
         moveCard(card, fromColumn, toColumn) {
-            setTimeout(() => {
-                if (fromColumn.cards.includes(card) && toColumn.cards.length < toColumn.maxCards) {
-                    fromColumn.cards.splice(fromColumn.cards.indexOf(card), 1);
-                    toColumn.cards.push(card);
-                }
-            }, 1);
+            if (fromColumn.cards.includes(card) && toColumn.cards.length < toColumn.maxCards) {
+                fromColumn.cards.splice(fromColumn.cards.indexOf(card), 1);
+                toColumn.cards.push(card);
+            } else if (toColumn.maxCards == null) {
+                fromColumn.cards.splice(fromColumn.cards.indexOf(card), 1);
+                toColumn.cards.push(card);
+            }
         },
 
         checkFirstColumnCards() {
@@ -33,7 +32,7 @@ new Vue({
                 const totalItems = card.items.length;
                 const completedItems = card.items.filter(item => item.completed).length;
 
-                if (completedItems / totalItems >= 0.5 && completedItems < totalItems) {
+                if (completedItems / totalItems > 0.5 && completedItems < totalItems) {
                     this.moveCard(card, this.columns[0], this.columns[1]);
                 }
             }
@@ -46,12 +45,12 @@ new Vue({
             if (completedItems === totalItems) {
                 card.completedAt = new Date().toLocaleString();
                 this.moveCard(card, this.columns[1], this.columns[2]);
-                this.isLocked = false; // Разблокируем первый столбец
-            } else if (completedItems / totalItems >= 0.5 && completedItems < totalItems && this.columns[0].cards.includes(card)) {
+                this.isLocked = false;
+            } else if (completedItems / totalItems > 0.5 && completedItems < totalItems) {
                 if (this.columns[1].cards.length < this.columns[1].maxCards) {
                     this.moveCard(card, this.columns[0], this.columns[1]);
                 } else {
-                    this.isLocked = true; // Блокируем первый столбец
+                    this.isLocked = true;
                 }
             }
         },
@@ -83,6 +82,35 @@ new Vue({
             if (this.newCard.items.length < 5) {
                 this.newCard.items.push('');
             }
+        },
+
+        saveState() {
+            localStorage.setItem('appState', JSON.stringify({
+                columns: this.columns,
+                isLocked: this.isLocked
+            }));
+        },
+
+        loadState() {
+            const storedState = localStorage.getItem('appState');
+            if (storedState) {
+                try {
+                    const parsedState = JSON.parse(storedState);
+                    this.columns = parsedState.columns;
+                    this.isLocked = parsedState.isLocked;
+                } catch (e) {
+                    console.error('Ошибка при разборе сохраненного состояния:', e);
+                    localStorage.removeItem('appState');
+                }
+            }
+        },
+
+        clearAllCards() {
+            this.columns.forEach(column => {
+                column.cards = [];
+            });
+            this.isLocked = false;
+            this.saveState();
         }
     },
 
@@ -101,9 +129,18 @@ new Vue({
                 if (!this.isLocked) {
                     this.checkFirstColumnCards();
                 }
+                this.saveState();
             },
             deep: true
+        },
+
+        isLocked: function(newVal) {
+            this.saveState();
         }
+    },
+
+    mounted() {
+        this.loadState();
     },
 
     computed: {
@@ -129,14 +166,14 @@ new Vue({
       </div>
       <div v-for="(column, colIndex) in columns" :key="colIndex" class="column">
         <h2>{{ column.name }}</h2>
-        <div v-for="(card, cardIndex) in column.cards" :key="cardIndex" class="card">
+        <div v-for="(card, cardIndex) in column.cards" :key="card.title + cardIndex" class="card">
           <h3>{{ card.title }}</h3>
           <ul>
             <li v-for="(item, itemIndex) in card.items" :key="itemIndex">
               <input type="checkbox" 
                      v-model="item.completed" 
                      @change="checkCompletion(card)" 
-                     :disabled="colIndex === 0 && isLocked">
+                     :disabled="colIndex === 0 && isLocked || colIndex === 2">
               {{ item.text }}
             </li>
           </ul>
