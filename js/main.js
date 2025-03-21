@@ -2,15 +2,15 @@ new Vue({
     el: '#app',
     data: {
         columns: [
-            { name: 'FirstColumn', cards: [] },
-            { name: 'SecondColumn', cards: [] },
-            { name: 'ThirdColumn', cards: [] }
+            { name: 'FirstColumn', cards: [], maxCards: 3 },
+            { name: 'SecondColumn', cards: [], maxCards: 5 },
+            { name: 'ThirdColumn', cards: [], maxCards: Infinity }
         ]
     },
     methods: {
         moveCard(card, fromColumn, toColumn) {
             const index = fromColumn.cards.indexOf(card);
-            if (index !== -1) {
+            if (index !== -1 && toColumn.cards.length < toColumn.maxCards) {
                 fromColumn.cards.splice(index, 1);
                 toColumn.cards.push(card);
             }
@@ -25,6 +25,11 @@ new Vue({
                 card.completedAt = new Date().toLocaleString();
                 this.moveCard(card, this.columns[1], this.columns[2]);
             }
+        },
+
+        isFirstColumnLocked() {
+            return this.columns[0].cards.length >= this.columns[0].maxCards &&
+                this.columns[1].cards.length >= this.columns[1].maxCards;
         }
     },
 
@@ -36,7 +41,7 @@ new Vue({
           <h3>{{ card.title }}</h3>
           <ul>
             <li v-for="(item, itemIndex) in card.items" :key="itemIndex">
-              <input type="checkbox" v-model="item.completed" @change="checkCompletion(card)">
+              <input type="checkbox" v-model="item.completed" @change="checkCompletion(card)" :disabled="isFirstColumnLocked() && colIndex === 0">
               {{ item.text }}
             </li>
           </ul>
@@ -51,9 +56,9 @@ new Vue({
         this.columns[0].cards.push({
             title: 'Card 1',
             items: [
-                { text: 'Item 1', completed: false },
-                { text: 'Item 2', completed: false },
-                { text: 'Item 3', completed: false }
+                { text: 'Разработать электронную версию', completed: false },
+                { text: 'Создать экземпляр игры', completed: false },
+                { text: 'Продать партию игр', completed: false }
             ]
         });
     }
