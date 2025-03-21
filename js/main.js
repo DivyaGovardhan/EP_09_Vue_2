@@ -10,10 +10,11 @@ new Vue({
         newCard: {
             title: '',
             items: ['', '', ''],
-            isPriority: false // Новое поле для приоритета
+            isPriority: false
         },
         isLocked: false,
-        isPriorityLocked: false // Флаг блокировки из-за приоритетной карточки
+        isPriorityLocked: false,
+        showModal: false,
     },
 
     methods: {
@@ -171,43 +172,54 @@ new Vue({
 
     template: `
     <div>
-      <div class="form-container">
-        <form @submit.prevent="addCard">
-            <div>
-                <label for="title">Title:</label>
-                <input type="text" id="title" v-model="newCard.title" required>
-            </div>
-            <div v-for="(item, index) in newCard.items" :key="index">
-                <label :for="'item-' + index">Item {{ index + 1 }}:</label>
-                <input type="text" :id="'item-' + index" v-model="newCard.items[index]" :required="itemRequired[index]">
-            </div>
-            <div>
-                <input type="checkbox" id="isPriority" v-model="newCard.isPriority">
-                <label for="isPriority">Приоритетная</label>
-            </div>
-            <button type="submit" :disabled="isLocked || isPriorityLocked">Add Card</button>
-        </form>
-      </div>
-      <div v-for="(column, colIndex) in columns" :key="colIndex" class="column">
-        <h2>{{ column.name }}</h2>
-        <div v-for="(card, cardIndex) in column.cards" :key="card.title + cardIndex" class="card">
-            <h3>{{ card.title }}</h3>
-            <p v-if="card.isPriority">Приоритетная</p>
-            <ul>
-                <li v-for="(item, itemIndex) in card.items" :key="itemIndex">
-                    <input type="checkbox" 
-                           v-model="item.completed" 
-                           @change="checkCompletion(card)" 
-                           :disabled="!card.isPriority && isPriorityLocked || colIndex === 2">
-                    {{ item.text }}
-                </li>
-            </ul>
-            <p v-if="card.completedAt">Completed at: {{ card.completedAt }}</p>
-        </div>
-      </div>
-      <p v-if="isPriorityLocked">Приложение заблокировано. Сначала выполните приоритетную задачу.</p>
+    <button @click="showModal = true" :disabled="isLocked || isPriorityLocked">Создать карточку</button>
 
-      <p v-if="isLocked">Первый столбец заблокирован. Завершите одну из карточек во втором столбце.</p>
+    <div v-if="showModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <button @click="showModal = false" class="close-modal">&times;</button>
+                <h2>Создать карточку</h2>
+            </div>
+            <div class="modal-body">
+                <form @submit.prevent="addCard">
+                    <div>
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" v-model="newCard.title" required>
+                    </div>
+                    <div v-for="(item, index) in newCard.items" :key="index">
+                        <label :for="'item-' + index">Item {{ index + 1 }}:</label>
+                        <input type="text" :id="'item-' + index" v-model="newCard.items[index]" :required="itemRequired[index]">
+                    </div>
+                    <div>
+                        <label for="isPriority">Приоритетная</label>
+                        <input type="checkbox" id="isPriority" v-model="newCard.isPriority">
+                    </div>
+                    <button type="submit" :disabled="isLocked || isPriorityLocked">Добавить карточку</button>
+                </form>
+            </div>
+        </div>
     </div>
+    
+    <div class="column-container">
+        <div v-for="(column, colIndex) in columns" :key="colIndex" class="column">
+            <h2>{{ column.name }}</h2>
+            <div v-for="(card, cardIndex) in column.cards" :key="card.title + cardIndex" class="card">
+                <h3>{{ card.title }}</h3>
+                <p v-if="card.isPriority">Приоритетная</p>
+                <ul>
+                    <li v-for="(item, itemIndex) in card.items" :key="itemIndex">
+                        <input type="checkbox" 
+                               v-model="item.completed" 
+                               @change="checkCompletion(card)" 
+                               :disabled="!card.isPriority && isPriorityLocked || colIndex === 2">
+                        {{ item.text }}
+                    </li>
+                </ul>
+                <p v-if="card.completedAt">Completed at: {{ card.completedAt }}</p>
+            </div>
+        </div>
+    </div>
+    <p v-if="isPriorityLocked">Приложение заблокировано. Сначала выполните приоритетную задачу.</p>
+</div>
   `,
 });
