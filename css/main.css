@@ -9,6 +9,11 @@ body{
     font-family: 'Montserrat';
 }
 
+.column-container {
+    display: flex;
+    justify-content: center;
+}
+
 .column {
     border: 1px solid #ccc;
     padding: 10px;
@@ -17,7 +22,7 @@ body{
     display: inline-block;
     vertical-align: top;
     border-radius: 4px;
-    max-width: 30%;
+    width: 30%;
 }
 
 ul{
@@ -41,8 +46,36 @@ input[type=checkbox]{
     padding: 10px;
     margin: 10px 0;
     list-style-type: none;
+    word-break: break-all;
 }
 
 .card:hover {
 
+}
+
+.form-container {
+    margin: 20px;
+}
+.form-container form {
+    display: flex;
+    flex-direction: column;
+}
+.form-container form div {
+    margin-bottom: 10px;
+}
+.form-container form label {
+    margin-right: 10px;
+}
+.form-container form input {
+    padding: 5px;
+}
+.form-container form button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.form-container form button:hover {
+    background-color: #0056b3;
 }
