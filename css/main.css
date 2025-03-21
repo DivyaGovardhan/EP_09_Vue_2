@@ -1,3 +1,14 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/Montserrat-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body{
+    font-family: 'Montserrat';
+}
+
 .column {
     border: 1px solid #ccc;
     padding: 10px;
@@ -5,9 +16,33 @@
     min-width: 200px;
     display: inline-block;
     vertical-align: top;
+    border-radius: 4px;
+    max-width: 30%;
 }
+
+ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul > li{
+    margin-bottom: 15px;
+}
+
+input[type=checkbox]{
+    height: 18px;
+    width: 18px;
+}
+
 .card {
     border: 1px solid #000;
+    border-radius: 4px;
     padding: 10px;
     margin: 10px 0;
+    list-style-type: none;
+}
+
+.card:hover {
+
 }
