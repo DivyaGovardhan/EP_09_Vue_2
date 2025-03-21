@@ -40,6 +40,10 @@ input[type=checkbox]{
     width: 18px;
 }
 
+input[type=checkbox][disabled] {
+    cursor: not-allowed;
+}
+
 .card {
     border: 1px solid #000;
     border-radius: 4px;
@@ -91,4 +95,9 @@ input[type=checkbox]{
 .form-container form button:hover {
     transition: 0.2s;
     background-color: #0056b3;
+}
+
+.form-container form button[disabled] {
+    background-color: #a5a5a5;
+    cursor: not-allowed;
 }

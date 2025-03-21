@@ -161,7 +161,7 @@ new Vue({
             <label :for="'item-' + index">Item {{ index + 1 }}:</label>
             <input type="text" :id="'item-' + index" v-model="newCard.items[index]" :required="itemRequired[index]">
           </div>
-          <button type="submit">Add Card</button>
+          <button type="submit" :disabled="isLocked">Add Card</button>
         </form>
       </div>
       <div v-for="(column, colIndex) in columns" :key="colIndex" class="column">
